@@ -53,9 +53,10 @@ $Box.Add_SelectedIndexChanged({
   $idx = $Box.SelectedIndex
   if ($idx -ge 0) {
     $t = $Tricks[$idx]
-    $val = reg query $t.Path /v $t.VName 2>$null
-    if ($val -match "REG_\w+\s+(\S+)") {
-      $CurLabel.Text = "Current: $($t.Path)  [$($t.VName)] = $($Matches[1])`nNew: $($t.Data)"
+    $val = reg query $t.Path /v $t.VName 2>$null | Out-String
+    $m = [regex]::Match($val, "REG_\w+\s+(.*)")
+    if ($m.Success) {
+      $CurLabel.Text = "Current: $($t.Path)  [$($t.VName)] = $($m.Groups[1].Value)`nNew: $($t.Data)"
     } else {
       $CurLabel.Text = "Current: NOT SET / NOT FOUND`nNew: $($t.Data)"
     }

@@ -16,6 +16,10 @@ $Tricks = @(
   [PSCustomObject]@{ID="015";Cat="Pranks";Name="Change Registered Owner";        Path="HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion";                     VName="RegisteredOwner"; Type="s"; Data="Admin"; Orig=""; Test="รัน winver → Registered Owner เปลี่ยน"}
   [PSCustomObject]@{ID="016";Cat="Performance";Name="Fast Shutdown (1s)";        Path="HKCU\Control Panel\Desktop";                                            VName="WaitToKillAppTimeout"; Type="d"; Data="1000"; Orig="5000"; Test="Shutdown → app ปิดเร็วขึ้น (1s)"}
   [PSCustomObject]@{ID="017";Cat="Performance";Name="Menu Delay 0";              Path="HKCU\Control Panel\Desktop";                                            VName="MenuShowDelay";  Type="d"; Data="0";  Orig="400"; Test="เปิด Start Menu → เมนูโผล่ทันที"}
+  [PSCustomObject]@{ID="018";Cat="Tweaks";Name="Show File Extensions";           Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";      VName="HideFileExt";    Type="d"; Data="0";  Orig="1"; Test="File Explorer → เห็น .txt .jpg ต่อท้ายไฟล์"}
+  [PSCustomObject]@{ID="019";Cat="Tweaks";Name="Disable Lock Screen";            Path="HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization";             VName="NoLockScreen";   Type="d"; Data="1";  Orig=""; Test="Lock (Win+L) → ไปที่ login เลย"}
+  [PSCustomObject]@{ID="020";Cat="Pranks";Name="Disable Alt+F4";                 Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoClose";        Type="d"; Data="1";  Orig=""; Note="Restart Explorer"; Test="กด Alt+F4 → ไม่มีอะไรเกิดขึ้น"}
+  [PSCustomObject]@{ID="021";Cat="Pranks";Name="Swap Mouse Buttons";             Path="HKCU\Control Panel\Mouse";                                              VName="SwapMouseButtons"; Type="s"; Data="1"; Orig="0"; Test="คลิกซ้าย → ทำหน้าที่คลิกขวา"}
 )
 
 $sel = @{}
@@ -31,8 +35,8 @@ function Show-Menu {
     if ($t.Cat -ne $c) { $c = $t.Cat; Write-Host "`n--- $c ---" -ForegroundColor Yellow }
     $m = if ($sel.ContainsKey($i)) { "X" } else { " " }
     Write-Host " [$m] $($t.ID) $($t.Name)" -NoNewline
-    if ($t.Note) { Write-Host "  ($($t.Desc)) [$($t.Note)]" -ForegroundColor DarkGray }
-    else { Write-Host "  ($($t.Desc))" -ForegroundColor DarkGray }
+    if ($t.Note) { Write-Host "  ($($t.Test)) [$($t.Note)]" -ForegroundColor DarkGray }
+    else { Write-Host "  ($($t.Test))" -ForegroundColor DarkGray }
     $i++
   }
   Write-Host "`nSelected: $($sel.Count) item(s)" -ForegroundColor $(if($sel.Count-gt0){'Green'}else{'Gray'})
@@ -122,7 +126,7 @@ while ($true) {
     "^b$" {
       $dir = Join-Path ([Environment]::GetFolderPath("Desktop")) "Backup_$(Get-Date -f yyyyMMdd_HHmmss)"
       New-Item -ItemType Directory -Path $dir -Force | Out-Null
-      "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer","HKCU\Control Panel\Desktop","HKLM\SYSTEM\CurrentControlSet\Services\UsbStor","HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" | ForEach-Object {
+      "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer","HKCU\Control Panel\Desktop","HKLM\SYSTEM\CurrentControlSet\Services\UsbStor","HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System","HKLM\SOFTWARE\Policies\Microsoft\Windows\Personalization" | ForEach-Object {
         $f = Join-Path $dir (($_ -replace '\\','_') + ".reg")
         reg export $_ $f 2>$null
       }

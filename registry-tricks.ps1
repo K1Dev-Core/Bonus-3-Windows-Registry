@@ -87,20 +87,34 @@ while ($true) {
     "^a$" {
       if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; break }
       $ok = 0; $fail = 0
-      foreach ($i in $sel.Keys) { if (Apply-Trick $Tricks[$i]) { $ok++ } else { $fail++ } }
+      foreach ($i in $sel.Keys) {
+        $t = $Tricks[$i]
+        Write-Host "  > $($t.Name)..." -NoNewline
+        if (Apply-Trick $t) { Write-Host " OK" -ForegroundColor Green; $ok++ }
+        else { Write-Host " FAIL" -ForegroundColor Red; $fail++ }
+      }
       Write-Host "Applied: $ok / $($sel.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
       pause; break
     }
     "^ra$" {
       $ok = 0; $fail = 0
-      0..($Tricks.Count-1) | ForEach-Object { if (Restore-Trick $Tricks[$_]) { $ok++ } else { $fail++ } }
+      foreach ($t in $Tricks) {
+        Write-Host "  > $($t.Name)..." -NoNewline
+        if (Restore-Trick $t) { Write-Host " OK" -ForegroundColor Green; $ok++ }
+        else { Write-Host " FAIL" -ForegroundColor Red; $fail++ }
+      }
       Write-Host "Restored: $ok / $($Tricks.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
       pause; break
     }
     "^r$" {
       if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; break }
       $ok = 0; $fail = 0
-      foreach ($i in $sel.Keys) { if (Restore-Trick $Tricks[$i]) { $ok++ } else { $fail++ } }
+      foreach ($i in $sel.Keys) {
+        $t = $Tricks[$i]
+        Write-Host "  > $($t.Name)..." -NoNewline
+        if (Restore-Trick $t) { Write-Host " OK" -ForegroundColor Green; $ok++ }
+        else { Write-Host " FAIL" -ForegroundColor Red; $fail++ }
+      }
       Write-Host "Restored: $ok / $($sel.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
       pause; break
     }

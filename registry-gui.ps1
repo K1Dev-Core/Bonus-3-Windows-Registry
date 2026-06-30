@@ -78,17 +78,16 @@ $BtnApply.Location = New-Object System.Drawing.Point(15, 440)
 $BtnApply.Add_Click({
   $sel = Get-Selected
   if ($sel.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Select items first.","Error"); return }
-  $d = Join-Path ([Environment]::GetFolderPath("Desktop")) "Tricks_$(Get-Date -f yyyyMMdd_HHmmss)"
-  New-Item -ItemType Directory -Path $d -Force | Out-Null
+  $ok = 0; $fail = 0
   foreach ($t in $sel) {
-    $c = "Windows Registry Editor Version 5.00`r`n`r`n[$($t.Path)]`r`n"
-    if ($t.Type -eq "d") { $c += "`"$($t.VName)`"=dword:$($t.Data)`r`n" }
-    else { $c += "`"$($t.VName)`"=`"$($t.Data)`"`r`n" }
-    $sn = $t.Name -replace '[\\/:*?"<>| ]','_'
-    $fn = "$($t.ID)_$sn.reg"
-    $c | Out-File (Join-Path $d $fn) -Encoding ascii
+    if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" /v $($t.VName) /t REG_DWORD /d $($t.Data) /f 2>&1" }
+    else { $cmd = "reg add `"$($t.Path)`" /v $($t.VName) /t REG_SZ /d `"$($t.Data)`" /f 2>&1" }
+    $r = Invoke-Expression $cmd
+    if ($LASTEXITCODE -eq 0) { $ok++ } else { $fail++ }
   }
-  [System.Windows.Forms.MessageBox]::Show("Done!`n$d`n`nDouble-click .reg files.","OK")
+  $msg = "Applied: $ok / $($sel.Count)"
+  if ($fail -gt 0) { $msg += "`nFailed: $fail" }
+  [System.Windows.Forms.MessageBox]::Show($msg,"Result")
 })
 
 $BtnSelect = New-Object System.Windows.Forms.Button

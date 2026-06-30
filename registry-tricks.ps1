@@ -63,22 +63,25 @@ function View-Item($i) {
 
 function Apply-Trick($t) {
   $vf = Get-VName $t
-  if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Data) /f" }
-  else { $cmd = "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Data)`" /f" }
-  $null = cmd /c $cmd 2>$null
+  $cmd = if ($t.Type -eq "d") { "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Data) /f" }
+         else { "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Data)`" /f" }
+  $r = cmd /c $cmd 2>&1
+  if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
   return $LASTEXITCODE -eq 0
 }
 
 function Restore-Trick($t) {
   if ($t.Orig) {
     $vf = Get-VName $t
-    if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Orig) /f" }
-    else { $cmd = "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Orig)`" /f" }
-    $null = cmd /c $cmd 2>$null
+    $cmd = if ($t.Type -eq "d") { "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Orig) /f" }
+           else { "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Orig)`" /f" }
+    $r = cmd /c $cmd 2>&1
+    if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
   } else {
     if ($t.VName) { $cmd = "reg delete `"$($t.Path)`" /v $($t.VName) /f" }
     else { $cmd = "reg delete `"$($t.Path)`" /ve /f" }
-    $null = cmd /c $cmd 2>$null
+    $r = cmd /c $cmd 2>&1
+    if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
   }
   return $LASTEXITCODE -eq 0
 }

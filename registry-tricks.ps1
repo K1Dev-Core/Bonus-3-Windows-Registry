@@ -11,7 +11,7 @@ $Tricks = @(
   [PSCustomObject]@{ID="010";Cat="Hide/Show";Name="Hide System Tray";            Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoTrayItemsDisplay"; Type="d"; Data="1"; Orig=""; Test="Taskbar → system tray หาย"}
   [PSCustomObject]@{ID="011";Cat="Logon";Name="Login Caption Title";             Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticecaption"; Type="s"; Data="Alert"; Orig=""; Test="Lock (Win+L) → เห็นข้อความ"}
   [PSCustomObject]@{ID="012";Cat="Logon";Name="Login Message Text";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticetext"; Type="s"; Data="Welcome"; Orig=""; Test="Lock (Win+L) → เห็นข้อความ"}
-  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Path="HKCR\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";                    VName="";                Type="s"; Data="DELETEME"; Orig=""; Note="Restart Explorer"; Test="ดู Desktop → ชื่อ Recycle Bin เปลี่ยน"}
+  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Path="HKLM\SOFTWARE\Classes\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";    VName="";                Type="s"; Data="DELETEME"; Orig="Recycle Bin"; Note="Restart Explorer"; Test="ดู Desktop → ชื่อ Recycle Bin เปลี่ยน"}
   [PSCustomObject]@{ID="014";Cat="Pranks";Name="Change IE Title";                Path="HKCU\Software\Microsoft\Internet Explorer\Main";                       VName="Window Title";   Type="s"; Data="My Browser"; Orig=""; Test="เปิด IE → Title เปลี่ยน"}
   [PSCustomObject]@{ID="015";Cat="Pranks";Name="Change Registered Owner";        Path="HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion";                     VName="RegisteredOwner"; Type="s"; Data="Admin"; Orig=""; Test="รัน winver → Registered Owner เปลี่ยน"}
   [PSCustomObject]@{ID="016";Cat="Performance";Name="Fast Shutdown (1s)";        Path="HKCU\Control Panel\Desktop";                                            VName="WaitToKillAppTimeout"; Type="d"; Data="1000"; Orig="5000"; Test="Shutdown → app ปิดเร็วขึ้น (1s)"}
@@ -65,7 +65,7 @@ function Apply-Trick($t) {
   $vf = Get-VName $t
   if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Data) /f" }
   else { $cmd = "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Data)`" /f" }
-  cmd /c $cmd 2>$null | Out-Null
+  $null = cmd /c $cmd 2>$null
   return $LASTEXITCODE -eq 0
 }
 
@@ -74,11 +74,11 @@ function Restore-Trick($t) {
     $vf = Get-VName $t
     if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Orig) /f" }
     else { $cmd = "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Orig)`" /f" }
-    cmd /c $cmd 2>$null | Out-Null
+    $null = cmd /c $cmd 2>$null
   } else {
     if ($t.VName) { $cmd = "reg delete `"$($t.Path)`" /v $($t.VName) /f" }
     else { $cmd = "reg delete `"$($t.Path)`" /ve /f" }
-    cmd /c $cmd 2>$null | Out-Null
+    $null = cmd /c $cmd 2>$null
   }
   return $LASTEXITCODE -eq 0
 }

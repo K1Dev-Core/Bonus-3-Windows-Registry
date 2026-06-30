@@ -42,14 +42,11 @@ function Show-Menu {
   Write-Host "`nSelected: $($sel.Count) item(s)" -ForegroundColor $(if($sel.Count-gt0){'Green'}else{'Gray'})
 }
 
-function Get-VName($t) {
-  if ($t.VName) { "/v $($t.VName)" } else { "/ve" }
-}
-
 function View-Item($i) {
   $t = $Tricks[$i]
-  $vf = Get-VName $t
-  $val = reg query $t.Path $vf 2>$null | Out-String
+  $a = @($t.Path)
+  if ($t.VName) { $a += "/v", $t.VName } else { $a += "/ve" }
+  $val = reg query @a 2>$null | Out-String
   $m = [regex]::Match($val, "REG_\w+\s+(.*)")
   $vn = if ($t.VName) { $t.VName } else { "(Default)" }
   Write-Host "$($t.Path) [$vn]" -ForegroundColor Cyan
@@ -62,27 +59,29 @@ function View-Item($i) {
 }
 
 function Apply-Trick($t) {
-  $vf = Get-VName $t
-  $cmd = if ($t.Type -eq "d") { "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Data) /f" }
-         else { "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Data)`" /f" }
-  $r = cmd /c $cmd 2>&1
+  $tn = if ($t.Type -eq "d") { "REG_DWORD" } else { "REG_SZ" }
+  $a = @($t.Path)
+  if ($t.VName) { $a += "/v", $t.VName } else { $a += "/ve" }
+  $a += "/t", $tn, "/d", $t.Data, "/f"
+  $r = reg add @a 2>&1
   if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
   return $LASTEXITCODE -eq 0
 }
 
 function Restore-Trick($t) {
   if ($t.Orig) {
-    $vf = Get-VName $t
-    $cmd = if ($t.Type -eq "d") { "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Orig) /f" }
-           else { "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Orig)`" /f" }
-    $r = cmd /c $cmd 2>&1
-    if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
+    $tn = if ($t.Type -eq "d") { "REG_DWORD" } else { "REG_SZ" }
+    $a = @($t.Path)
+    if ($t.VName) { $a += "/v", $t.VName } else { $a += "/ve" }
+    $a += "/t", $tn, "/d", $t.Orig, "/f"
+    $r = reg add @a 2>&1
   } else {
-    if ($t.VName) { $cmd = "reg delete `"$($t.Path)`" /v $($t.VName) /f" }
-    else { $cmd = "reg delete `"$($t.Path)`" /ve /f" }
-    $r = cmd /c $cmd 2>&1
-    if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
+    $a = @($t.Path)
+    if ($t.VName) { $a += "/v", $t.VName } else { $a += "/ve" }
+    $a += "/f"
+    $r = reg delete @a 2>&1
   }
+  if ($LASTEXITCODE -ne 0) { Write-Host "`n  ERROR: $($r -join ' ')" -ForegroundColor DarkRed }
   return $LASTEXITCODE -eq 0
 }
 

@@ -108,7 +108,8 @@ $BtnBackup.Add_Click({
   $dir = Join-Path ([Environment]::GetFolderPath("Desktop")) "Backup_$(Get-Date -f yyyyMMdd_HHmmss)"
   New-Item -ItemType Directory -Path $dir -Force | Out-Null
   "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer","HKCU\Control Panel\Desktop","HKLM\SYSTEM\CurrentControlSet\Services\UsbStor" | ForEach-Object {
-    reg export $_ (Join-Path $dir ($_ -replace '\\','_')+".reg") 2>$null
+    $f = Join-Path $dir (($_ -replace '\\','_')+".reg")
+    reg export $_ $f 2>$null
   }
   [System.Windows.Forms.MessageBox]::Show("Backup saved to:`n$dir","Done")
 })

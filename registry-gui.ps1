@@ -84,7 +84,8 @@ $BtnApply.Add_Click({
     $c = "Windows Registry Editor Version 5.00`r`n`r`n[$($t.Path)]`r`n"
     if ($t.Type -eq "d") { $c += "`"$($t.VName)`"=dword:$($t.Data)`r`n" }
     else { $c += "`"$($t.VName)`"=`"$($t.Data)`"`r`n" }
-    $c | Out-File (Join-Path $d "$($t.ID)_$($t.Name-replace' ','').reg") -Encoding ascii
+    $fn = "$($t.ID)_$($t.Name.Replace(' ','')).reg"
+    $c | Out-File (Join-Path $d $fn) -Encoding ascii
   }
   [System.Windows.Forms.MessageBox]::Show("Done!`n$d`n`nDouble-click .reg files.","OK")
 })

@@ -52,7 +52,7 @@ function View-Item($i) {
   else { Write-Host "  Current: (not set)" -ForegroundColor Yellow }
   Write-Host "  New: $($t.Data)" -ForegroundColor White
   if ($t.Orig) { Write-Host "  Original: $($t.Orig)" -ForegroundColor Magenta }
-  else { Write-Host "  Original: (not set / delete)" -ForegroundColor Magenta }
+  else { Write-Host "  Original: (delete to restore)" -ForegroundColor Magenta }
 }
 
 function Apply-Trick($t) {
@@ -79,57 +79,60 @@ function Restore-Trick($t) {
 
 while ($true) {
   Show-Menu
-  $ans = Read-Host "`n(num=toggle, a=apply selected, r=restore selected, ra=restore all, b=backup, v#=view, all, none, q=quit)"
+  $ans = Read-Host "`n(num=toggle, a=apply, r=restore, ra=restore-all, b=backup, v#=view, all, none, q=quit)"
 
   switch -r ($ans.ToLower().Trim()) {
-    "q" { exit }
-    "a" {
-      if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; continue }
+    "^q$" { exit }
+    "^a$" {
+      if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; break }
       $ok = 0; $fail = 0
       foreach ($i in $sel.Keys) { if (Apply-Trick $Tricks[$i]) { $ok++ } else { $fail++ } }
       Write-Host "Applied: $ok / $($sel.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
-      pause
+      pause; break
     }
-    "ra" {
+    "^ra$" {
       $ok = 0; $fail = 0
       0..($Tricks.Count-1) | ForEach-Object { if (Restore-Trick $Tricks[$_]) { $ok++ } else { $fail++ } }
       Write-Host "Restored: $ok / $($Tricks.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
-      pause
+      pause; break
     }
-    "r" {
-      if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; continue }
+    "^r$" {
+      if ($sel.Count -eq 0) { Write-Host "Nothing selected!" -ForegroundColor Red; pause; break }
       $ok = 0; $fail = 0
       foreach ($i in $sel.Keys) { if (Restore-Trick $Tricks[$i]) { $ok++ } else { $fail++ } }
       Write-Host "Restored: $ok / $($sel.Count)" -ForegroundColor $(if ($fail -eq 0){'Green'}else{'Yellow'})
-      pause
+      pause; break
     }
-    "b" {
+    "^b$" {
       $dir = Join-Path ([Environment]::GetFolderPath("Desktop")) "Backup_$(Get-Date -f yyyyMMdd_HHmmss)"
       New-Item -ItemType Directory -Path $dir -Force | Out-Null
       "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer","HKCU\Control Panel\Desktop","HKLM\SYSTEM\CurrentControlSet\Services\UsbStor","HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" | ForEach-Object {
-        $f = Join-Path $dir ($_ -replace '\\','_') + ".reg"
+        $f = Join-Path $dir (($_ -replace '\\','_') + ".reg")
         reg export $_ $f 2>$null
       }
       Write-Host "Backup saved to: $dir" -ForegroundColor Green
-      pause
+      pause; break
     }
-    { $_ -match '^v(\d+)$' } { View-Item ([int]$matches[1]-1); pause }
-    "all" { for ($i=0;$i -lt $Tricks.Count;$i++) { $sel[$i] = $true } }
-    "none" { $sel.Clear() }
-    { $_ -match '^(\d+)-(\d+)$' } {
+    "^v(\d+)$" { View-Item ([int]$matches[1]-1); pause; break }
+    "^all$" { for ($i=0;$i -lt $Tricks.Count;$i++) { $sel[$i] = $true }; break }
+    "^none$" { $sel.Clear(); break }
+    "^(\d+)-(\d+)$" {
       $a = [int]$matches[1]; $b = [int]$matches[2]
       if ($a -gt $b) { $a,$b = $b,$a }
       for ($n=$a;$n -le $b;$n++) { if ($n -ge 1 -and $n -le $Tricks.Count) { $sel[$n-1] = -not $sel[$n-1] } }
+      break
     }
-    { $_ -match '^\d+$' } {
+    "^\d+$" {
       $n = [int]$_
       if ($n -ge 1 -and $n -le $Tricks.Count) { $sel[$n-1] = -not $sel[$n-1] }
+      break
     }
-    { $_ -match '^[\d,\s]+$' } {
+    "^[\d,\s]+$" {
       [regex]::Matches($_, '\d+') | ForEach-Object {
         $n = [int]$_.Value
         if ($n -ge 1 -and $n -le $Tricks.Count) { $sel[$n-1] = -not $sel[$n-1] }
       }
+      break
     }
     default { Write-Host "Invalid: $ans" -ForegroundColor Red; pause }
   }

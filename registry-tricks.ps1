@@ -1,21 +1,21 @@
 $Tricks = @(
-  [PSCustomObject]@{ID="001";Cat="Security";Name="Disable USB Storage";         Path="HKLM\SYSTEM\CurrentControlSet\Services\UsbStor";                       VName="Start";          Type="d"; Data="4";  Orig="3"}
-  [PSCustomObject]@{ID="002";Cat="Security";Name="Hide Control Panel";           Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoControlPanel"; Type="d"; Data="1";  Orig=""}
-  [PSCustomObject]@{ID="003";Cat="Security";Name="Disable Task Manager";         Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System";        VName="DisableTaskMgr"; Type="d"; Data="1";  Orig=""}
-  [PSCustomObject]@{ID="004";Cat="Security";Name="Disable CMD";                  Path="HKCU\Software\Policies\Microsoft\Windows\System";                       VName="DisableCMD";     Type="d"; Data="1";  Orig=""}
-  [PSCustomObject]@{ID="005";Cat="Security";Name="Disable Regedit";              Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System";        VName="DisableRegistryTools"; Type="d"; Data="1";  Orig=""}
-  [PSCustomObject]@{ID="006";Cat="Security";Name="Disable AutoRun";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDriveTypeAutoRun"; Type="d"; Data="255"; Orig=""}
-  [PSCustomObject]@{ID="007";Cat="Hide/Show";Name="Hide Drive C";                Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="4";  Orig=""; Note="Restart Explorer"}
-  [PSCustomObject]@{ID="008";Cat="Hide/Show";Name="Hide All Drives";             Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="67108863"; Orig=""; Note="Restart Explorer"}
-  [PSCustomObject]@{ID="009";Cat="Hide/Show";Name="Hide Desktop Icons";          Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDesktop";      Type="d"; Data="1";  Orig=""}
-  [PSCustomObject]@{ID="010";Cat="Hide/Show";Name="Hide System Tray";            Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoTrayItemsDisplay"; Type="d"; Data="1"; Orig=""}
-  [PSCustomObject]@{ID="011";Cat="Logon";Name="Login Caption Title";             Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticecaption"; Type="s"; Data="Alert"; Orig=""}
-  [PSCustomObject]@{ID="012";Cat="Logon";Name="Login Message Text";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticetext"; Type="s"; Data="Welcome"; Orig=""}
-  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Path="HKCR\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";                    VName="";                Type="s"; Data="DELETEME"; Orig=""}
-  [PSCustomObject]@{ID="014";Cat="Pranks";Name="Change IE Title";                Path="HKCU\Software\Microsoft\Internet Explorer\Main";                       VName="Window Title";   Type="s"; Data="My Browser"; Orig=""}
-  [PSCustomObject]@{ID="015";Cat="Pranks";Name="Change Registered Owner";        Path="HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion";                     VName="RegisteredOwner"; Type="s"; Data="Admin"; Orig=""}
-  [PSCustomObject]@{ID="016";Cat="Performance";Name="Fast Shutdown (1s)";        Path="HKCU\Control Panel\Desktop";                                            VName="WaitToKillAppTimeout"; Type="d"; Data="1000"; Orig="5000"}
-  [PSCustomObject]@{ID="017";Cat="Performance";Name="Menu Delay 0";              Path="HKCU\Control Panel\Desktop";                                            VName="MenuShowDelay";  Type="d"; Data="0";  Orig="400"}
+  [PSCustomObject]@{ID="001";Cat="Security";Name="Disable USB Storage";         Path="HKLM\SYSTEM\CurrentControlSet\Services\UsbStor";                       VName="Start";          Type="d"; Data="4";  Orig="3"; Test="เสียบ USB → ไม่ขึ้น drive"}
+  [PSCustomObject]@{ID="002";Cat="Security";Name="Hide Control Panel";           Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoControlPanel"; Type="d"; Data="1";  Orig=""; Test="เปิด Control Panel → ถูกบล็อก"}
+  [PSCustomObject]@{ID="003";Cat="Security";Name="Disable Task Manager";         Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System";        VName="DisableTaskMgr"; Type="d"; Data="1";  Orig=""; Test="Ctrl+Alt+Del → Task Manager disable"}
+  [PSCustomObject]@{ID="004";Cat="Security";Name="Disable CMD";                  Path="HKCU\Software\Policies\Microsoft\Windows\System";                       VName="DisableCMD";     Type="d"; Data="1";  Orig=""; Test="เปิด cmd.exe → ถูกบล็อก"}
+  [PSCustomObject]@{ID="005";Cat="Security";Name="Disable Regedit";              Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System";        VName="DisableRegistryTools"; Type="d"; Data="1";  Orig=""; Test="เปิด regedit → ถูกบล็อก"}
+  [PSCustomObject]@{ID="006";Cat="Security";Name="Disable AutoRun";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDriveTypeAutoRun"; Type="d"; Data="255"; Orig=""; Test="เสียบ USB → ไม่ AutoRun"}
+  [PSCustomObject]@{ID="007";Cat="Hide/Show";Name="Hide Drive C";                Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="4";  Orig=""; Note="Restart Explorer"; Test="เปิด File Explorer → ไม่เห็น C:"}
+  [PSCustomObject]@{ID="008";Cat="Hide/Show";Name="Hide All Drives";             Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="67108863"; Orig=""; Note="Restart Explorer"; Test="เปิด File Explorer → ไม่เห็น drive ไหนเลย"}
+  [PSCustomObject]@{ID="009";Cat="Hide/Show";Name="Hide Desktop Icons";          Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDesktop";      Type="d"; Data="1";  Orig=""; Test="Desktop → icon หาย"}
+  [PSCustomObject]@{ID="010";Cat="Hide/Show";Name="Hide System Tray";            Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoTrayItemsDisplay"; Type="d"; Data="1"; Orig=""; Test="Taskbar → system tray หาย"}
+  [PSCustomObject]@{ID="011";Cat="Logon";Name="Login Caption Title";             Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticecaption"; Type="s"; Data="Alert"; Orig=""; Test="Lock (Win+L) → เห็นข้อความ"}
+  [PSCustomObject]@{ID="012";Cat="Logon";Name="Login Message Text";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticetext"; Type="s"; Data="Welcome"; Orig=""; Test="Lock (Win+L) → เห็นข้อความ"}
+  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Path="HKCR\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";                    VName="";                Type="s"; Data="DELETEME"; Orig=""; Note="Restart Explorer"; Test="ดู Desktop → ชื่อ Recycle Bin เปลี่ยน"}
+  [PSCustomObject]@{ID="014";Cat="Pranks";Name="Change IE Title";                Path="HKCU\Software\Microsoft\Internet Explorer\Main";                       VName="Window Title";   Type="s"; Data="My Browser"; Orig=""; Test="เปิด IE → Title เปลี่ยน"}
+  [PSCustomObject]@{ID="015";Cat="Pranks";Name="Change Registered Owner";        Path="HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion";                     VName="RegisteredOwner"; Type="s"; Data="Admin"; Orig=""; Test="รัน winver → Registered Owner เปลี่ยน"}
+  [PSCustomObject]@{ID="016";Cat="Performance";Name="Fast Shutdown (1s)";        Path="HKCU\Control Panel\Desktop";                                            VName="WaitToKillAppTimeout"; Type="d"; Data="1000"; Orig="5000"; Test="Shutdown → app ปิดเร็วขึ้น (1s)"}
+  [PSCustomObject]@{ID="017";Cat="Performance";Name="Menu Delay 0";              Path="HKCU\Control Panel\Desktop";                                            VName="MenuShowDelay";  Type="d"; Data="0";  Orig="400"; Test="เปิด Start Menu → เมนูโผล่ทันที"}
 )
 
 $sel = @{}
@@ -52,6 +52,7 @@ function View-Item($i) {
   if ($m.Success) { Write-Host "  Current: $($m.Groups[1].Value)" -ForegroundColor Green }
   else { Write-Host "  Current: (not set)" -ForegroundColor Yellow }
   Write-Host "  New: $($t.Data)" -ForegroundColor White
+  Write-Host "  Test: $($t.Test)" -ForegroundColor DarkYellow
   if ($t.Orig) { Write-Host "  Original: $($t.Orig)" -ForegroundColor Magenta }
   else { Write-Host "  Original: (delete to restore)" -ForegroundColor Magenta }
 }

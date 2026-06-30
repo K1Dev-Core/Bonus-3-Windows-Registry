@@ -14,7 +14,7 @@ $Tricks = @(
   [PSCustomObject]@{ID="010";Cat="Hide/Show";Name="Hide System Tray";            Desc="Hide notification area";           Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoTrayItemsDisplay"; Type="d"; Data="1"}
   [PSCustomObject]@{ID="011";Cat="Logon";Name="Login Caption Title";             Desc="Custom login title bar text";      Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticecaption"; Type="s"; Data="Alert"}
   [PSCustomObject]@{ID="012";Cat="Logon";Name="Login Message Text";              Desc="Custom message before login";      Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticetext"; Type="s"; Data="Welcome"}
-  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Desc="Change Recycle Bin name";          Path="HKCR\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";                    VName="@";               Type="s"; Data="DELETE ME"}
+  [PSCustomObject]@{ID="013";Cat="Pranks";Name="Rename Recycle Bin";             Desc="Change Recycle Bin name";          Path="HKCR\CLSID\{645FF040-5081-101B-9F08-00AA002F954E}";                    VName="";                Type="s"; Data="DELETE ME"}
   [PSCustomObject]@{ID="014";Cat="Pranks";Name="Change IE Title";                Desc="Change IE/Edge window title";      Path="HKCU\Software\Microsoft\Internet Explorer\Main";                       VName="Window Title";   Type="s"; Data="My Browser"}
   [PSCustomObject]@{ID="015";Cat="Pranks";Name="Change Registered Owner";        Desc="Change PC owner name";             Path="HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion";                     VName="RegisteredOwner"; Type="s"; Data="Admin"}
   [PSCustomObject]@{ID="016";Cat="Performance";Name="Fast Shutdown 1s";          Desc="Shutdown waits only 1 sec";        Path="HKCU\Control Panel\Desktop";                                            VName="WaitToKillAppTimeout"; Type="d"; Data="1000"}
@@ -53,10 +53,12 @@ $Box.Add_SelectedIndexChanged({
   $idx = $Box.SelectedIndex
   if ($idx -ge 0) {
     $t = $Tricks[$idx]
-    $val = reg query $t.Path /v $t.VName 2>$null | Out-String
+    $vf = if ($t.VName) { @("/v",$t.VName) } else { @("/ve") }
+    $val = & reg query $t.Path $vf 2>$null | Out-String
     $m = [regex]::Match($val, "REG_\w+\s+(.*)")
     if ($m.Success) {
-      $CurLabel.Text = "Current: $($t.Path)  [$($t.VName)] = $($m.Groups[1].Value)`nNew: $($t.Data)"
+      $vn = if ($t.VName) { $t.VName } else { "(Default)" }
+      $CurLabel.Text = "Current: $($t.Path)  [$vn] = $($m.Groups[1].Value)`nNew: $($t.Data)"
     } else {
       $CurLabel.Text = "Current: NOT SET / NOT FOUND`nNew: $($t.Data)"
     }
@@ -80,9 +82,10 @@ $BtnApply.Add_Click({
   if ($sel.Count -eq 0) { [System.Windows.Forms.MessageBox]::Show("Select items first.","Error"); return }
   $ok = 0; $fail = 0
   foreach ($t in $sel) {
-    if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" /v $($t.VName) /t REG_DWORD /d $($t.Data) /f 2>&1" }
-    else { $cmd = "reg add `"$($t.Path)`" /v $($t.VName) /t REG_SZ /d `"$($t.Data)`" /f 2>&1" }
-    $r = Invoke-Expression $cmd
+    $vf = if ($t.VName) { "/v $($t.VName)" } else { "/ve" }
+    if ($t.Type -eq "d") { $cmd = "reg add `"$($t.Path)`" $vf /t REG_DWORD /d $($t.Data) /f 2>&1" }
+    else { $cmd = "reg add `"$($t.Path)`" $vf /t REG_SZ /d `"$($t.Data)`" /f 2>&1" }
+    $r = cmd /c $cmd
     if ($LASTEXITCODE -eq 0) { $ok++ } else { $fail++ }
   }
   $msg = "Applied: $ok / $($sel.Count)"

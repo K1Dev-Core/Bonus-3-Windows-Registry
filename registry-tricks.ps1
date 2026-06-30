@@ -5,8 +5,8 @@ $Tricks = @(
   [PSCustomObject]@{ID="004";Cat="Security";Name="Disable CMD";                  Path="HKCU\Software\Policies\Microsoft\Windows\System";                       VName="DisableCMD";     Type="d"; Data="1";  Orig=""}
   [PSCustomObject]@{ID="005";Cat="Security";Name="Disable Regedit";              Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\System";        VName="DisableRegistryTools"; Type="d"; Data="1";  Orig=""}
   [PSCustomObject]@{ID="006";Cat="Security";Name="Disable AutoRun";              Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDriveTypeAutoRun"; Type="d"; Data="255"; Orig=""}
-  [PSCustomObject]@{ID="007";Cat="Hide/Show";Name="Hide Drive C";                Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="4";  Orig=""}
-  [PSCustomObject]@{ID="008";Cat="Hide/Show";Name="Hide All Drives";             Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="67108863"; Orig=""}
+  [PSCustomObject]@{ID="007";Cat="Hide/Show";Name="Hide Drive C";                Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="4";  Orig=""; Note="Restart Explorer"}
+  [PSCustomObject]@{ID="008";Cat="Hide/Show";Name="Hide All Drives";             Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDrives";       Type="d"; Data="67108863"; Orig=""; Note="Restart Explorer"}
   [PSCustomObject]@{ID="009";Cat="Hide/Show";Name="Hide Desktop Icons";          Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoDesktop";      Type="d"; Data="1";  Orig=""}
   [PSCustomObject]@{ID="010";Cat="Hide/Show";Name="Hide System Tray";            Path="HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer";      VName="NoTrayItemsDisplay"; Type="d"; Data="1"; Orig=""}
   [PSCustomObject]@{ID="011";Cat="Logon";Name="Login Caption Title";             Path="HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";        VName="legalnoticecaption"; Type="s"; Data="Alert"; Orig=""}
@@ -31,7 +31,8 @@ function Show-Menu {
     if ($t.Cat -ne $c) { $c = $t.Cat; Write-Host "`n--- $c ---" -ForegroundColor Yellow }
     $m = if ($sel.ContainsKey($i)) { "X" } else { " " }
     Write-Host " [$m] $($t.ID) $($t.Name)" -NoNewline
-    Write-Host "  ($($t.Desc))" -ForegroundColor DarkGray
+    if ($t.Note) { Write-Host "  ($($t.Desc)) [$($t.Note)]" -ForegroundColor DarkGray }
+    else { Write-Host "  ($($t.Desc))" -ForegroundColor DarkGray }
     $i++
   }
   Write-Host "`nSelected: $($sel.Count) item(s)" -ForegroundColor $(if($sel.Count-gt0){'Green'}else{'Gray'})
